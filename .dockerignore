@@ -1,12 +1,23 @@
+# 基础排除
 .git
 .gitmodules
 .vscode
 .cursor
+.DS_Store
+Thumbs.db
+
+# Python 缓存排除
 __pycache__
 *.py[cod]
 *.pyo
 *.pyd
 *.log
 *.sqlite3
-.DS_Store
-Thumbs.db
+
+# 🚀 致命体积元凶排除（必须加！）
+venv/
+.venv/
+env/
+# 排除本地可能下载过的 playwright 内核缓存
+ms-playwright/
+playwright/
