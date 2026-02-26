@@ -1,21 +1,25 @@
-# 1. 核心绝杀：使用 bullseye 版本的极简骨架（完美兼容旧字体包，体积只有 100 多 MB！）
+# 1. 使用我们验证过不会报错的极简老系统
 FROM python:3.11-slim-bullseye
 
-# 2. 设置工作目录
 WORKDIR /app
 
-# 3. 复制依赖清单并安装
+# 2. 复制依赖清单
 COPY requirements.txt .
+
+# 3. 【核心脱水魔法】强行指定安装纯 CPU 版的 torch（如果项目用到 AI 库，这步能砍掉 2.5GB 体积！）
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu || true
+
+# 4. 正常安装其他的包
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. 只精准安装 Chromium 及其底层依赖 (bullseye 系统下绝对不会再报 ttf-unifont 错误！)
-RUN playwright install chromium --with-deps
+# 5. 精准安装浏览器，并立刻清理系统缓存垃圾
+RUN playwright install chromium --with-deps && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /root/.cache/pip
 
-# 5. 经过 .dockerignore 安检后，拷贝纯净代码
 COPY . .
 
-# 6. 放行端口
 EXPOSE 8000
 
-# 7. 启动指令
 CMD ["uvicorn", "coze_api:app", "--host", "0.0.0.0", "--port", "8000"]
