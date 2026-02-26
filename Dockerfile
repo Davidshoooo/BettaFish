@@ -1,5 +1,5 @@
-# 1. 使用极简版 Python 骨架
-FROM python:3.11-slim
+# 1. 使用微软官方 Playwright 镜像（自带完美无缺的浏览器和底层环境，直接跳过依赖报错坑！）
+FROM mcr.microsoft.com/playwright/python:v1.42.0-jammy
 
 # 2. 设置工作目录
 WORKDIR /app
@@ -8,14 +8,11 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 4. 仅安装 Chromium 及必需底层库 (极大节省体积)
-RUN playwright install chromium --with-deps
-
-# 5. 经过顶级安检门后，拷贝纯净代码
+# 4. 经过 .dockerignore 安检门后，拷贝纯净代码（体积不到几 MB）
 COPY . .
 
-# 6. 放行端口
+# 5. 放行端口
 EXPOSE 8000
 
-# 7. 启动 API 服务
+# 6. 启动 API 服务
 CMD ["uvicorn", "coze_api:app", "--host", "0.0.0.0", "--port", "8000"]
