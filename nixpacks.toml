@@ -1,0 +1,18 @@
+# Railway / Nixpacks 环境配置
+# 用于 BettaFish 项目部署，确保 Playwright Chromium 及系统依赖被正确安装
+
+[phases.setup]
+# 保留 Nixpacks 默认的 Python 环境
+nixPkgs = ["..."]
+
+[phases.install]
+# 先执行默认的 pip install，再安装 Playwright 浏览器及系统依赖
+cmds = ["...", "playwright install chromium --with-deps"]
+
+[phases.build]
+# 构建阶段可留空或沿用默认
+cmds = ["..."]
+
+# 启动命令：供 Railway 运行 FastAPI 服务（Coze 回调入口）
+[start]
+cmd = "uvicorn coze_api:app --host 0.0.0.0 --port ${PORT:-8000}"
